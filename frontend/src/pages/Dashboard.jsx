@@ -67,9 +67,15 @@ const Dashboard = () => {
                 <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
                         <div>
-                            <div className="inline-flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-full mb-6 border border-white/5 backdrop-blur-xl">
-                                <Activity className="h-3 w-3 text-green-400 animate-pulse" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-primary-200 italic">User Session Active</span>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="inline-flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-xl">
+                                    <Activity className="h-3 w-3 text-green-400 animate-pulse" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary-200 italic">User Session Active</span>
+                                </div>
+                                <div className="inline-flex items-center space-x-2 bg-primary-500/10 px-4 py-2 rounded-full border border-primary-500/20 backdrop-blur-xl">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary-400 italic">School Code:</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-white italic">{user.schoolCode || '---'}</span>
+                                </div>
                             </div>
                             <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-4 italic uppercase leading-none">
                                 Welcome, <span className="text-primary-500">{user.name.split(' ')[0]}</span>.
@@ -190,15 +196,15 @@ const Dashboard = () => {
                                         <div
                                             key={stud._id}
                                             className={`flex items-center justify-between p-5 rounded-[2rem] transition-all duration-300 ${idx === 0
-                                                    ? 'bg-amber-50 border border-amber-100 shadow-xl shadow-amber-900/5'
-                                                    : 'hover:bg-gray-50'
+                                                ? 'bg-amber-50 border border-amber-100 shadow-xl shadow-amber-900/5'
+                                                : 'hover:bg-gray-50'
                                                 }`}
                                         >
                                             <div className="flex items-center space-x-4">
                                                 <div className={`h-12 w-12 rounded-2xl flex items-center justify-center font-black italic ${idx === 0 ? 'bg-amber-400 text-white shadow-lg' :
-                                                        idx === 1 ? 'bg-gray-200 text-gray-600' :
-                                                            idx === 2 ? 'bg-orange-100 text-orange-600' :
-                                                                'bg-gray-50 text-gray-300 border border-gray-100'
+                                                    idx === 1 ? 'bg-gray-200 text-gray-600' :
+                                                        idx === 2 ? 'bg-orange-100 text-orange-600' :
+                                                            'bg-gray-50 text-gray-300 border border-gray-100'
                                                     }`}>
                                                     {idx + 1}
                                                 </div>
@@ -206,9 +212,9 @@ const Dashboard = () => {
                                                     <p className="font-black text-indigo-950 tracking-tight italic uppercase text-sm leading-none mb-1">{stud.name}</p>
                                                     <div className="flex items-center space-x-2">
                                                         <span className={`h-1.5 w-1.5 rounded-full ${stud.house === 'Red' ? 'bg-red-500' :
-                                                                stud.house === 'Blue' ? 'bg-blue-500' :
-                                                                    stud.house === 'Green' ? 'bg-green-500' :
-                                                                        'bg-amber-500'
+                                                            stud.house === 'Blue' ? 'bg-blue-500' :
+                                                                stud.house === 'Green' ? 'bg-green-500' :
+                                                                    'bg-amber-500'
                                                             }`}></span>
                                                         <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest italic">{stud.house}</span>
                                                     </div>
@@ -239,9 +245,9 @@ const Dashboard = () => {
                                         <div className="h-3 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100">
                                             <div
                                                 className={`h-full transition-all duration-1000 group-hover:opacity-80 ${house === 'Red' ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' :
-                                                        house === 'Blue' ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' :
-                                                            house === 'Green' ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' :
-                                                                'bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
+                                                    house === 'Blue' ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' :
+                                                        house === 'Green' ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' :
+                                                            'bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
                                                     }`}
                                                 style={{ width: '65%' }}
                                             ></div>

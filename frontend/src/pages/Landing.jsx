@@ -77,10 +77,13 @@ const Landing = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [schoolRegistrationSuccess, setSchoolRegistrationSuccess] = useState(null);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        // Auto-uppercase schoolCode for students
+        const finalValue = name === 'schoolCode' ? value.toUpperCase() : value;
+        setFormData(prev => ({ ...prev, [name]: finalValue }));
         setError('');
     };
 
@@ -88,12 +91,24 @@ const Landing = () => {
         setLoading(true);
         const result = await method(type === 'login' ? formData.email : formData, type === 'login' ? formData.password : undefined, type === 'login' ? type : undefined);
         setLoading(false);
-        if (result.success) navigate('/dashboard');
+        if (result.success) {
+            if (mode === 'school-register') {
+                // Find the school just registered from context if needed, 
+                // but AuthContext doesn't pass the code back directly in the result object easily.
+                // However, the backend DOES send it. 
+                // Let's modify handleAction to handle the user object from result if possible.
+                // Actually, let's just use the user object from useAuth() which is updated on success.
+                setSchoolRegistrationSuccess(true);
+            } else {
+                navigate('/dashboard');
+            }
+        }
         else setError(result.message);
     };
 
     const resetForm = (newMode) => {
         setMode(newMode);
+        setSchoolRegistrationSuccess(null);
         setFormData({ name: '', email: '', password: '', schoolCode: '', house: 'Red' });
         setError('');
     };
@@ -308,51 +323,79 @@ const Landing = () => {
 
             {mode === 'school-register' && (
                 <AuthLayout
-                    title="Setup Unit."
-                    subtitle="Forge a new institutional node."
+                    title={schoolRegistrationSuccess ? "Node Forged." : "Setup Unit."}
+                    subtitle={schoolRegistrationSuccess ? "Your institutional identity is active." : "Forge a new institutional node."}
                     onBack={() => resetForm('school-login')}
                     error={error}
                     loading={loading}
-                    onSubmit={(e) => { e.preventDefault(); handleAction(() => registerSchool(formData), 'register'); }}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        if (schoolRegistrationSuccess) navigate('/dashboard');
+                        else handleAction(() => registerSchool(formData), 'register');
+                    }}
                 >
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Institution Name</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
-                                placeholder="Global Science Faculty"
-                                required
-                            />
+                    {schoolRegistrationSuccess ? (
+                        <div className="space-y-10 py-4 animate-in fade-in zoom-in-95 duration-700">
+                            <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-10 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
+                                <div className="relative z-10 text-center">
+                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em] mb-4 block italic">Access Manifest Code</span>
+                                    <h4 className="text-6xl font-black text-white italic tracking-tighter select-all">{user?.uniqueCode}</h4>
+                                    <p className="mt-6 text-[11px] text-primary-100/30 font-bold uppercase tracking-widest leading-relaxed italic">
+                                        Distribute this protocol key to your <br />authorized student body.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-2xl flex items-center space-x-4">
+                                <div className="bg-emerald-500 p-2 rounded-lg">
+                                    <ShieldCheck className="h-4 w-4 text-white" />
+                                </div>
+                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">
+                                    Security Layer established.
+                                </p>
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Master Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
-                                placeholder="head@faculty.org"
-                                required
-                            />
+                    ) : (
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Institution Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    placeholder="Global Science Faculty"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Master Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    placeholder="head@faculty.org"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Master Key</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Master Key</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
-                    </div>
+                    )}
                 </AuthLayout>
             )}
         </div>

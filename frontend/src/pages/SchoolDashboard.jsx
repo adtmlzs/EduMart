@@ -90,7 +90,13 @@ const SchoolDashboard = () => {
                         </div>
                         <div>
                             <h2 className="text-2xl font-black tracking-tighter uppercase italic leading-none">Oversight.</h2>
-                            <span className="text-[9px] font-black text-primary-400 uppercase tracking-[0.3em] mt-1.5 block italic opacity-60">Command Central</span>
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black text-primary-400 uppercase tracking-[0.3em] mt-1.5 block italic opacity-60">Command Central</span>
+                                <div className="mt-2 inline-flex items-center space-x-1.5 bg-white/5 border border-white/5 px-2 py-1 rounded-lg">
+                                    <span className="text-[10px] font-black text-primary-300 uppercase tracking-widest italic">Code:</span>
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest italic select-all">{user.uniqueCode}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

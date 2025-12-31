@@ -130,7 +130,7 @@ app.post('/api/auth/register-student', async (req, res) => {
 
         res.status(201).json({
             token: `token-student-${user._id}`,
-            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house }
+            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -153,7 +153,8 @@ app.post('/api/auth/login', async (req, res) => {
                 return res.status(403).json({ message: 'Your account has been suspended by the school administrator.' });
             }
 
-            res.json({ token: `token-student-${user._id}`, user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: user.points, house: user.house, clubsJoined: user.clubsJoined } });
+            const school = await School.findById(user.schoolId);
+            res.json({ token: `token-student-${user._id}`, user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: user.points, house: user.house, clubsJoined: user.clubsJoined, schoolCode: school.uniqueCode } });
         }
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
