@@ -194,7 +194,7 @@ const Dashboard = () => {
                                 ) : leaderboard.length > 0 ? (
                                     leaderboard.slice(0, 5).map((stud, idx) => (
                                         <div
-                                            key={stud._id}
+                                            key={stud.house}
                                             className={`flex items-center justify-between p-5 rounded-[2rem] transition-all duration-300 ${idx === 0
                                                 ? 'bg-amber-50 border border-amber-100 shadow-xl shadow-amber-900/5'
                                                 : 'hover:bg-gray-50'

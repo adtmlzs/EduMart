@@ -110,7 +110,7 @@ const Landing = () => {
     const resetForm = (newMode) => {
         setMode(newMode);
         setSchoolRegistrationSuccess(null);
-        setFormData({ name: '', email: '', password: '', schoolCode: '', house: 'Red' });
+        setFormData({ name: '', email: '', password: '', schoolCode: '', uniqueCode: '', house: 'Red' });
         setError('');
     };
 
