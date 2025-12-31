@@ -1,0 +1,41 @@
+const mongoose = require('mongoose');
+
+const clubPollSchema = new mongoose.Schema({
+    clubId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Club',
+        required: true
+    },
+    question: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    options: [{
+        text: {
+            type: String,
+            required: true
+        },
+        votes: {
+            type: Number,
+            default: 0
+        }
+    }],
+    votedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    }
+}, {
+    timestamps: true
+});
+
+module.exports = mongoose.model('ClubPoll', clubPollSchema);

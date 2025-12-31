@@ -1,0 +1,108 @@
+const express = require('express');
+const router = express.Router();
+const Poll = require('../models/Poll');
+const User = require('../models/User');
+
+// Create Poll
+router.post('/create', async (req, res) => {
+    try {
+        const { question, options, durationHours, createdBy, schoolId } = req.body;
+
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + parseInt(durationHours));
+
+        const poll = new Poll({
+            question,
+            options: options.map(opt => ({ text: opt, votes: 0 })),
+            createdBy,
+            schoolId,
+            expiresAt
+        });
+
+        await poll.save();
+        res.status(201).json({ message: 'Poll created successfully', poll });
+    } catch (error) {
+        console.error('Create Poll Error:', error);
+        res.status(500).json({ message: 'Server error creating poll' });
+    }
+});
+
+// Get Polls for school
+router.get('/', async (req, res) => {
+    try {
+        const { schoolId } = req.query;
+        if (!schoolId) return res.status(400).json({ message: 'School ID required' });
+
+        const polls = await Poll.find({ schoolId })
+            .populate('createdBy', 'name')
+            .sort({ createdAt: -1 });
+
+        res.json({ polls });
+    } catch (error) {
+        console.error('Get Polls Error:', error);
+        res.status(500).json({ message: 'Server error fetching polls' });
+    }
+});
+
+// Vote in Poll
+router.put('/vote/:id', async (req, res) => {
+    try {
+        const { userId, optionIndex } = req.body;
+        const poll = await Poll.findById(req.params.id);
+
+        if (!poll) return res.status(404).json({ message: 'Poll not found' });
+
+        if (new Date() > poll.expiresAt) {
+            return res.status(400).json({ message: 'This poll has expired' });
+        }
+
+        if (poll.votedUsers.includes(userId)) {
+            return res.status(400).json({ message: 'You have already voted in this poll' });
+        }
+
+        poll.options[optionIndex].votes += 1;
+        poll.votedUsers.push(userId);
+
+        await poll.save();
+        await User.findByIdAndUpdate(userId, { $inc: { points: 1 } });
+
+        if (poll.createdBy.toString() !== userId) {
+            const Notification = require('../models/Notification');
+            const voter = await User.findById(userId);
+            await new Notification({
+                userId: poll.createdBy,
+                message: `${voter.name} voted on your poll: "${poll.question}"`,
+                type: 'poll'
+            }).save();
+        }
+
+        res.json({ message: 'Vote recorded!', poll });
+    } catch (error) {
+        console.error('Vote Error:', error);
+        res.status(500).json({ message: 'Server error recording vote' });
+    }
+});
+
+// End Poll manually (by creator)
+router.put('/:id/end', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const poll = await Poll.findById(req.params.id);
+
+        if (!poll) return res.status(404).json({ message: 'Poll not found' });
+
+        if (poll.createdBy.toString() !== userId) {
+            return res.status(403).json({ message: 'Only the creator can end this poll' });
+        }
+
+        poll.expiresAt = new Date();
+        await poll.save();
+
+        res.json({ message: 'Poll ended successfully', poll });
+    } catch (error) {
+        console.error('End Poll Error:', error);
+        res.status(500).json({ message: 'Server error ending poll' });
+    }
+});
+
+module.exports = router;
