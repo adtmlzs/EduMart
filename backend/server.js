@@ -110,20 +110,19 @@ app.post('/api/auth/register-school', async (req, res) => {
         const school = new School({ name, email, password, uniqueCode: uniqueCode.toUpperCase() });
         await school.save();
 
-        res.status(201).json({
-            const token = jwt.sign(
-                { id: school._id, role: 'school', uniqueCode: school.uniqueCode },
-                JWT_SECRET // School ID acts as its own filtering ID if needed, but schools usually don't have "schoolId" field, they ARE the school.
-            );
+        const token = jwt.sign(
+            { id: school._id, role: 'school', uniqueCode: school.uniqueCode },
+            JWT_SECRET
+        );
 
-            res.status(201).json({
-                token,
-                user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode }
-            });
-        } catch (error) {
-            res.status(500).json({ message: 'Server error' });
-        }
-    });
+        res.status(201).json({
+            token,
+            user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
 app.post('/api/auth/register-student', async (req, res) => {
     try {
@@ -134,20 +133,19 @@ app.post('/api/auth/register-student', async (req, res) => {
         const user = new User({ name, email, password, role: 'student', schoolId: school._id, house });
         await user.save();
 
-        res.status(201).json({
-            const token = jwt.sign(
-                { id: user._id, role: 'student', schoolId: school._id, house: user.house },
-                JWT_SECRET
-            );
+        const token = jwt.sign(
+            { id: user._id, role: 'student', schoolId: school._id, house: user.house },
+            JWT_SECRET
+        );
 
-            res.status(201).json({
-                token,
-                user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
-            });
-        } catch (error) {
-            res.status(500).json({ message: 'Server error' });
-        }
-    });
+        res.status(201).json({
+            token,
+            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
 app.post('/api/auth/login', async (req, res) => {
     try {
