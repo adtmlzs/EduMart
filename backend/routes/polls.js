@@ -48,12 +48,19 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Vote in Poll
-router.put('/vote/:id', async (req, res) => {
+router.put('/vote/:id', auth, async (req, res) => {
     try {
-        const { userId, optionIndex } = req.body;
+        const { optionIndex } = req.body;
+        const userId = req.user.id;
         const poll = await Poll.findById(req.params.id);
 
         if (!poll) return res.status(404).json({ message: 'Poll not found' });
+
+        // Checks for strict isolation
+        const userSchoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+        if (poll.schoolId.toString() !== userSchoolId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access to this poll' });
+        }
 
         if (new Date() > poll.expiresAt) {
             return res.status(400).json({ message: 'This poll has expired' });
@@ -72,11 +79,15 @@ router.put('/vote/:id', async (req, res) => {
         if (poll.createdBy.toString() !== userId) {
             const Notification = require('../models/Notification');
             const voter = await User.findById(userId);
-            await new Notification({
-                userId: poll.createdBy,
-                message: `${voter.name} voted on your poll: "${poll.question}"`,
-                type: 'poll'
-            }).save();
+            // Only create notification if it's not the creator voting on their own poll (unlikely but possible)
+            if (voter) {
+                await new Notification({
+                    userId: poll.createdBy,
+                    message: `${voter.name} voted on your poll: "${poll.question}"`,
+                    type: 'poll',
+                    schoolId: userSchoolId // Ensure notification has schoolId
+                }).save();
+            }
         }
 
         res.json({ message: 'Vote recorded!', poll });
@@ -87,9 +98,9 @@ router.put('/vote/:id', async (req, res) => {
 });
 
 // End Poll manually (by creator)
-router.put('/:id/end', async (req, res) => {
+router.put('/:id/end', auth, async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.user.id;
         const poll = await Poll.findById(req.params.id);
 
         if (!poll) return res.status(404).json({ message: 'Poll not found' });

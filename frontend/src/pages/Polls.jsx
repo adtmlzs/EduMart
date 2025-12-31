@@ -40,7 +40,6 @@ const Polls = () => {
     const handleVote = async (pollId, optionIndex) => {
         try {
             await API.put(`/polls/vote/${pollId}`, {
-                userId: user.id,
                 optionIndex
             });
             fetchPolls();
@@ -52,7 +51,7 @@ const Polls = () => {
     const handleEndPoll = async (pollId) => {
         if (!window.confirm('End this poll now?')) return;
         try {
-            await API.put(`/polls/${pollId}/end`, { userId: user.id });
+            await API.put(`/polls/${pollId}/end`);
             fetchPolls();
         } catch (error) {
             console.error('End Poll Error:', error);
