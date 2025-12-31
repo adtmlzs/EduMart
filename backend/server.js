@@ -4,6 +4,8 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'edumart_secret_key';
 
 const School = require('./models/School');
 const User = require('./models/User');
@@ -15,6 +17,7 @@ const Confession = require('./models/Confession');
 const Message = require('./models/Message');
 const Conversation = require('./models/Conversation');
 const Notification = require('./models/Notification');
+const auth = require('./middleware/auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -95,29 +98,32 @@ const generateSchoolCode = () => {
 
 app.post('/api/auth/register-school', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, uniqueCode } = req.body;
         const existingSchool = await School.findOne({ email });
         if (existingSchool) return res.status(400).json({ message: 'Email already registered' });
 
-        let uniqueCode;
-        let codeExists = true;
-        while (codeExists) {
-            uniqueCode = generateSchoolCode();
-            const existing = await School.findOne({ uniqueCode });
-            codeExists = !!existing;
-        }
+        if (!uniqueCode) return res.status(400).json({ message: 'School Code is required' });
 
-        const school = new School({ name, email, password, uniqueCode });
+        const existingCode = await School.findOne({ uniqueCode: uniqueCode.toUpperCase() });
+        if (existingCode) return res.status(400).json({ message: 'School Code already taken' });
+
+        const school = new School({ name, email, password, uniqueCode: uniqueCode.toUpperCase() });
         await school.save();
 
         res.status(201).json({
-            token: `token-school-${school._id}`,
-            user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode }
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
+            const token = jwt.sign(
+                { id: school._id, role: 'school', uniqueCode: school.uniqueCode },
+                JWT_SECRET // School ID acts as its own filtering ID if needed, but schools usually don't have "schoolId" field, they ARE the school.
+            );
+
+            res.status(201).json({
+                token,
+                user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode }
+            });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    });
 
 app.post('/api/auth/register-student', async (req, res) => {
     try {
@@ -129,13 +135,19 @@ app.post('/api/auth/register-student', async (req, res) => {
         await user.save();
 
         res.status(201).json({
-            token: `token-student-${user._id}`,
-            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
+            const token = jwt.sign(
+                { id: user._id, role: 'student', schoolId: school._id, house: user.house },
+                JWT_SECRET
+            );
+
+            res.status(201).json({
+                token,
+                user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
+            });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    });
 
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -143,7 +155,13 @@ app.post('/api/auth/login', async (req, res) => {
         if (role === 'school') {
             const school = await School.findOne({ email, password });
             if (!school) return res.status(401).json({ message: 'Invalid credentials' });
-            res.json({ token: `token-school-${school._id}`, user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode } });
+
+            const token = jwt.sign(
+                { id: school._id, role: 'school', uniqueCode: school.uniqueCode },
+                JWT_SECRET
+            );
+
+            res.json({ token, user: { id: school._id, name: school.name, email: school.email, role: 'school', uniqueCode: school.uniqueCode } });
         } else {
             const user = await User.findOne({ email, password, role: 'student' });
             if (!user) return res.status(401).json({ message: 'Invalid credentials' });
@@ -154,7 +172,13 @@ app.post('/api/auth/login', async (req, res) => {
             }
 
             const school = await School.findById(user.schoolId);
-            res.json({ token: `token-student-${user._id}`, user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: user.points, house: user.house, clubsJoined: user.clubsJoined, schoolCode: school.uniqueCode } });
+
+            const token = jwt.sign(
+                { id: user._id, role: 'student', schoolId: user.schoolId, house: user.house },
+                JWT_SECRET
+            );
+
+            res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: user.points, house: user.house, clubsJoined: user.clubsJoined, schoolCode: school.uniqueCode } });
         }
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -175,12 +199,10 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Items API
-app.get('/api/items', async (req, res) => {
+app.get('/api/items', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-        if (!schoolId || schoolId === 'undefined') {
-            return res.json({ items: [] });
-        }
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+
         const items = await Item.find({ schoolId }).populate('seller', 'name').sort({ createdAt: -1 });
         res.json({ items });
     } catch (error) {
@@ -197,9 +219,12 @@ app.get('/api/items/:id', async (req, res) => {
     }
 });
 
-app.post('/api/items', async (req, res) => {
+app.post('/api/items', auth, async (req, res) => {
     try {
-        const { title, description, price, category, condition, seller, schoolId, imageUrl, imageAlignment } = req.body;
+        const { title, description, price, category, condition, imageUrl, imageAlignment } = req.body;
+        const seller = req.user.id;
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+
         const item = new Item({
             title,
             description,
@@ -220,10 +245,11 @@ app.post('/api/items', async (req, res) => {
     }
 });
 
-app.put('/api/items/:id', async (req, res) => {
+app.put('/api/items/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, category, condition, imageUrl, imageAlignment, sellerId } = req.body;
+        const { title, description, price, category, condition, imageUrl, imageAlignment } = req.body;
+        const sellerId = req.user.id;
 
         const item = await Item.findById(id);
         if (!item) return res.status(404).json({ message: 'Item not found' });
@@ -246,10 +272,10 @@ app.put('/api/items/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/items/:id', async (req, res) => {
+app.delete('/api/items/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
-        const { sellerId } = req.query;
+        const sellerId = req.user.id;
 
         const item = await Item.findById(id);
         if (!item) return res.status(404).json({ message: 'Item not found' });

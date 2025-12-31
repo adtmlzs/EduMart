@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Confession = require('../models/Confession');
+const auth = require('../middleware/auth');
 
 // Submit confession (Instant publish)
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
-        const { content, schoolId } = req.body;
+        const { content } = req.body;
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const confession = new Confession({
             content,
@@ -21,10 +23,9 @@ router.post('/', async (req, res) => {
 });
 
 // Get all confessions for school
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-        if (!schoolId) return res.status(400).json({ message: 'School ID required' });
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const confessions = await Confession.find({ schoolId })
             .sort({ createdAt: -1 });

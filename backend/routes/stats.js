@@ -1,15 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // Get House Cup leaderboard
-router.get('/leaderboard', async (req, res) => {
+router.get('/leaderboard', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-
-        if (!schoolId || schoolId === 'undefined') {
-            return res.status(400).json({ message: 'Valid School ID required' });
-        }
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const mongoose = require('mongoose');
 

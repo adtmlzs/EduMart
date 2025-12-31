@@ -2,11 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Poll = require('../models/Poll');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // Create Poll
-router.post('/create', async (req, res) => {
+router.post('/create', auth, async (req, res) => {
     try {
-        const { question, options, durationHours, createdBy, schoolId } = req.body;
+        const { question, options, durationHours } = req.body;
+        const createdBy = req.user.id;
+        // Determine schoolId: if user is school admin, use their ID; else use user's schoolId
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + parseInt(durationHours));
@@ -28,10 +32,9 @@ router.post('/create', async (req, res) => {
 });
 
 // Get Polls for school
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-        if (!schoolId) return res.status(400).json({ message: 'School ID required' });
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const polls = await Poll.find({ schoolId })
             .populate('createdBy', 'name')

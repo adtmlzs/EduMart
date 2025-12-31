@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Club = require('../models/Club');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // Get all clubs for school
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-        if (!schoolId) return res.status(400).json({ message: 'School ID required' });
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const clubs = await Club.find({ schoolId })
             .populate('createdBy', 'name email')
@@ -22,13 +22,20 @@ router.get('/', async (req, res) => {
 });
 
 // Get Single Club with full member names
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const club = await Club.findById(req.params.id)
             .populate('members', 'name')
             .populate('createdBy', 'name');
 
         if (!club) return res.status(404).json({ message: 'Club not found' });
+
+        // Strict Isolation: Check if club belongs to user's school
+        const userSchoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+        if (club.schoolId.toString() !== userSchoolId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access to this club' });
+        }
+
         res.json({ club });
     } catch (error) {
         console.error('Get Single Club Error:', error);
@@ -37,13 +44,19 @@ router.get('/:id', async (req, res) => {
 });
 
 // Join Club
-router.put('/join/:id', async (req, res) => {
+router.put('/join/:id', auth, async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.user.id; // From Auth Token
         const clubId = req.params.id;
 
         const club = await Club.findById(clubId);
         if (!club) return res.status(404).json({ message: 'Club not found' });
+
+        // Isolation Check
+        const userSchoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+        if (club.schoolId.toString() !== userSchoolId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access to this club' });
+        }
 
         if (club.members.includes(userId)) {
             return res.status(400).json({ message: 'Already a member of this club' });
@@ -65,10 +78,11 @@ router.put('/join/:id', async (req, res) => {
 });
 
 // Create new club
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
-        const { name, description, createdBy, createdById, schoolId } = req.body;
-        const creatorId = createdBy || createdById;
+        const { name, description } = req.body;
+        const creatorId = req.user.id;
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const club = new Club({
             name,
@@ -81,7 +95,7 @@ router.post('/', async (req, res) => {
         await club.save();
 
         // Update user
-        await User.findByIdAndUpdate(createdById, {
+        await User.findByIdAndUpdate(creatorId, {
             $inc: { points: 50 },
             $push: { clubsJoined: club._id }
         });

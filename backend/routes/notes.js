@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Note = require('../models/Note');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // Upload a new note
-router.post('/upload', async (req, res) => {
+router.post('/upload', auth, async (req, res) => {
     try {
-        const { title, subject, pdfUrl, price, authorId, schoolId } = req.body;
+        const { title, subject, pdfUrl, price } = req.body;
+        const authorId = req.user.id;
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const note = new Note({
             title,
@@ -28,19 +31,14 @@ router.post('/upload', async (req, res) => {
         });
     } catch (error) {
         console.error('Upload Note Error:', error);
-        console.log('Request Body:', req.body);
         res.status(500).json({ message: 'Server error uploading note', error: error.message });
     }
 });
 
 // Get all notes for a school
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const { schoolId } = req.query;
-
-        if (!schoolId) {
-            return res.status(400).json({ message: 'School ID required' });
-        }
+        const schoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
 
         const notes = await Note.find({ schoolId })
             .populate('author', 'name email isAlumni')
@@ -54,15 +52,21 @@ router.get('/', async (req, res) => {
 });
 
 // Buy/Unlock a note
-router.post('/buy/:id', async (req, res) => {
+router.post('/buy/:id', auth, async (req, res) => {
     try {
         const noteId = req.params.id;
-        const { buyerId } = req.body;
+        const buyerId = req.user.id;
 
         // Get the note
         const note = await Note.findById(noteId).populate('author');
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
+        }
+
+        // Strict Isolation
+        const userSchoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+        if (note.schoolId.toString() !== userSchoolId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access to this note' });
         }
 
         // Get the buyer
@@ -149,10 +153,11 @@ router.post('/buy/:id', async (req, res) => {
 });
 
 // Update a note
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, subject, pdfUrl, price, authorId } = req.body;
+        const { title, subject, pdfUrl, price } = req.body;
+        const authorId = req.user.id;
 
         const note = await Note.findById(id);
         if (!note) return res.status(404).json({ message: 'Note not found' });
@@ -176,10 +181,10 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a note
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
-        const { authorId } = req.query; // Pass via query or body
+        const authorId = req.user.id;
 
         const note = await Note.findById(id);
         if (!note) return res.status(404).json({ message: 'Note not found' });

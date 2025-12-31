@@ -73,6 +73,7 @@ const Landing = () => {
         email: '',
         password: '',
         schoolCode: '',
+        uniqueCode: '',
         house: 'Red'
     });
     const [error, setError] = useState('');
@@ -81,8 +82,8 @@ const Landing = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // Auto-uppercase schoolCode for students
-        const finalValue = name === 'schoolCode' ? value.toUpperCase() : value;
+        // Auto-uppercase schoolCode/uniqueCode
+        const finalValue = (name === 'schoolCode' || name === 'uniqueCode') ? value.toUpperCase() : value;
         setFormData(prev => ({ ...prev, [name]: finalValue }));
         setError('');
     };
@@ -391,6 +392,18 @@ const Landing = () => {
                                     onChange={handleInputChange}
                                     className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
                                     placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Create Unique Code</label>
+                                <input
+                                    type="text"
+                                    name="uniqueCode"
+                                    value={formData.uniqueCode}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm uppercase tracking-widest"
+                                    placeholder="DPS-2025"
                                     required
                                 />
                             </div>
