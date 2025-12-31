@@ -5,11 +5,37 @@ const Notification = require('../models/Notification');
 // Get notifications for user
 router.get('/:userId', async (req, res) => {
     try {
-        const notifications = await Notification.find({ userId: req.params.userId })
+        const { userId } = req.params;
+        const User = require('../models/User');
+        const user = await User.findById(userId);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const schoolId = user.schoolId;
+
+        // Fetch personal notifications AND broadcast notifications for the school
+        let notifications = await Notification.find({
+            $or: [
+                { userId: userId },
+                { schoolId: schoolId, userId: null } // Broadcasts
+            ]
+        })
             .sort({ createdAt: -1 })
-            .limit(20);
+            .limit(50); // Increased limit
+
+        // Post-process to set isRead correctly for broadcasts
+        notifications = notifications.map(notif => {
+            const notifObj = notif.toObject();
+            if (!notifObj.userId) { // If broadcast
+                // It is read if the user's ID is in the readBy array
+                notifObj.isRead = notif.readBy && notif.readBy.map(id => id.toString()).includes(userId);
+            }
+            return notifObj;
+        });
+
         res.json(notifications);
     } catch (error) {
+        console.error('Get Notifications Error:', error);
         res.status(500).json({ message: 'Server error fetching notifications' });
     }
 });
@@ -17,9 +43,25 @@ router.get('/:userId', async (req, res) => {
 // Mark notification as read
 router.put('/:id/read', async (req, res) => {
     try {
-        await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
+        const notification = await Notification.findById(req.params.id);
+        if (!notification) return res.status(404).json({ message: 'Notification not found' });
+
+        const { userId } = req.body; // Expect userId in body now for broadcasts
+
+        if (notification.userId) {
+            // Personal notification
+            notification.isRead = true;
+        } else {
+            // Broadcast notification
+            if (userId && !notification.readBy.includes(userId)) {
+                notification.readBy.push(userId);
+            }
+        }
+        await notification.save();
+
         res.json({ message: 'Notification marked as read' });
     } catch (error) {
+        console.error('Read Notification Error:', error);
         res.status(500).json({ message: 'Server error updating notification' });
     }
 });
@@ -27,10 +69,24 @@ router.put('/:id/read', async (req, res) => {
 // Mark all notifications as read for user
 router.put('/mark-all-read/:userId', async (req, res) => {
     try {
+        const { userId } = req.params;
+        const User = require('../models/User');
+        const user = await User.findById(userId);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // 1. Mark personal notifications
         await Notification.updateMany(
-            { userId: req.params.userId, isRead: false },
+            { userId: userId, isRead: false },
             { isRead: true }
         );
+
+        // 2. Mark broadcast notifications (add user to readBy)
+        await Notification.updateMany(
+            { schoolId: user.schoolId, userId: null, readBy: { $ne: userId } },
+            { $addToSet: { readBy: userId } }
+        );
+
         res.json({ message: 'All notifications marked as read' });
     } catch (error) {
         console.error('Mark all read error:', error);

@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const notificationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: 'User'
+        // required: false for broadcast notifications
     },
     schoolId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,7 +23,11 @@ const notificationSchema = new mongoose.Schema({
     isRead: {
         type: Boolean,
         default: false
-    }
+    },
+    readBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 }, {
     timestamps: true
 });

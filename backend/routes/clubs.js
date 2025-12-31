@@ -100,6 +100,15 @@ router.post('/', auth, async (req, res) => {
             $push: { clubsJoined: club._id }
         });
 
+        // Create Broadcast Notification
+        const Notification = require('../models/Notification');
+        await new Notification({
+            userId: null, // Broadcast
+            schoolId,
+            message: `New Club Founded: "${name}". Join the commune now!`,
+            type: 'club'
+        }).save();
+
         const populatedClub = await Club.findById(club._id).populate('members', 'name');
         res.status(201).json({ message: 'Club created!', club: populatedClub });
     } catch (error) {

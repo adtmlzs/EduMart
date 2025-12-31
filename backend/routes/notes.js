@@ -25,6 +25,15 @@ router.post('/upload', auth, async (req, res) => {
         const populatedNote = await Note.findById(note._id)
             .populate('author', 'name email isAlumni');
 
+        // Create Broadcast Notification
+        const Notification = require('../models/Notification');
+        await new Notification({
+            userId: null, // Broadcast
+            schoolId,
+            message: `New Study Material: "${title}" in ${subject}. Access the Vault!`,
+            type: 'system'
+        }).save();
+
         res.status(201).json({
             message: 'Note uploaded successfully!',
             note: populatedNote

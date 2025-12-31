@@ -24,6 +24,16 @@ router.post('/create', auth, async (req, res) => {
         });
 
         await poll.save();
+
+        // Create Broadcast Notification
+        const Notification = require('../models/Notification');
+        await new Notification({
+            userId: null, // Broadcast to all
+            schoolId,
+            message: `New Poll Created: "${question}". Go vote now!`,
+            type: 'poll'
+        }).save();
+
         res.status(201).json({ message: 'Poll created successfully', poll });
     } catch (error) {
         console.error('Create Poll Error:', error);
