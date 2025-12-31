@@ -9,7 +9,10 @@ import {
     ChevronRight, Clock, Plus, Zap
 } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+let SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+if (SOCKET_URL && !SOCKET_URL.startsWith('http')) {
+    SOCKET_URL = `https://${SOCKET_URL}`;
+}
 
 const Inbox = () => {
     const { user } = useAuth();
