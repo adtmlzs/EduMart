@@ -73,7 +73,7 @@ const Dashboard = () => {
                                     <span className="text-[9px] font-black uppercase tracking-widest text-primary-200 italic">User Session Active</span>
                                 </div>
                                 <div className="inline-flex items-center space-x-2 bg-primary-500/10 px-4 py-2 rounded-full border border-primary-500/20 backdrop-blur-xl">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary-400 italic">School Code:</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary-400 italic">Unique Code:</span>
                                     <span className="text-[9px] font-black uppercase tracking-widest text-white italic">{user.schoolCode || '---'}</span>
                                 </div>
                             </div>

@@ -305,14 +305,14 @@ const Landing = () => {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Access Code</label>
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Unique Code</label>
                                 <input
                                     type="text"
                                     name="schoolCode"
                                     value={formData.schoolCode}
                                     onChange={handleInputChange}
                                     className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm uppercase tracking-widest"
-                                    placeholder="SCH-0X"
+                                    placeholder="UNIQUE CODE:"
                                     required
                                 />
                             </div>
@@ -339,10 +339,10 @@ const Landing = () => {
                             <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-10 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
                                 <div className="relative z-10 text-center">
-                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em] mb-4 block italic">Access Manifest Code</span>
+                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em] mb-4 block italic">Unique Institution Code</span>
                                     <h4 className="text-6xl font-black text-white italic tracking-tighter select-all">{user?.uniqueCode}</h4>
                                     <p className="mt-6 text-[11px] text-primary-100/30 font-bold uppercase tracking-widest leading-relaxed italic">
-                                        Distribute this protocol key to your <br />authorized student body.
+                                        Distribute this unique code to your <br />authorized student body.
                                     </p>
                                 </div>
                             </div>
