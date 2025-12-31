@@ -31,7 +31,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
-const MONGODB_URI = 'mongodb+srv://edu:edu@cluster0.l5xjdsf.mongodb.net/?appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://edu:edu@cluster0.l5xjdsf.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
