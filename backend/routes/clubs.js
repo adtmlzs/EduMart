@@ -77,6 +77,37 @@ router.put('/join/:id', auth, async (req, res) => {
     }
 });
 
+// Leave Club
+router.put('/leave/:id', auth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const clubId = req.params.id;
+
+        const club = await Club.findById(clubId);
+        if (!club) return res.status(404).json({ message: 'Club not found' });
+
+        // Isolation Check
+        const userSchoolId = req.user.role === 'school' ? req.user.id : req.user.schoolId;
+        if (club.schoolId.toString() !== userSchoolId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access to this club' });
+        }
+
+        // Remove user from club members
+        await Club.findByIdAndUpdate(clubId, { $pull: { members: userId } });
+
+        // Remove club from user's joined list
+        await User.findByIdAndUpdate(userId, { $pull: { clubsJoined: clubId } });
+
+        const updatedClub = await Club.findById(clubId).populate('members', 'name');
+
+        res.json({ message: 'Successfully left the club!', club: updatedClub });
+    } catch (error) {
+        console.error('Leave Club Error:', error);
+        res.status(500).json({ message: 'Server error leaving club' });
+    }
+});
+
+
 // Create new club
 router.post('/', auth, async (req, res) => {
     try {

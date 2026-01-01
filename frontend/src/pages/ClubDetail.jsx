@@ -44,6 +44,17 @@ const ClubDetail = () => {
         }
     };
 
+    const handleLeave = async () => {
+        if (!window.confirm('Terminate synchronization with this collective node?')) return;
+        try {
+            const response = await API.put(`/clubs/leave/${id}`);
+            setClub(response.data.club);
+            updateUser({ clubsJoined: (user.clubsJoined || []).filter(cid => cid !== id) });
+        } catch (error) {
+            console.error('Leave Error:', error);
+        }
+    };
+
     if (!user) return null;
 
     if (loading) return (
@@ -185,7 +196,16 @@ const ClubDetail = () => {
                                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 italic">Access Granted</span>
                                     </div>
                                     <h3 className="text-4xl font-black mb-2 italic uppercase tracking-tighter leading-none">Internal <br />Node</h3>
-                                    <p className="text-primary-100/30 text-[9px] font-black uppercase tracking-[0.3em] leading-none italic">Verified Collective Identity</p>
+                                    <p className="text-primary-100/30 text-[9px] font-black uppercase tracking-[0.3em] leading-none italic mb-10">Verified Collective Identity</p>
+
+                                    {club.createdBy?._id !== user.id && (
+                                        <button
+                                            onClick={handleLeave}
+                                            className="w-full bg-white/10 hover:bg-red-500/20 text-white/50 hover:text-red-200 py-4 rounded-[1.8rem] font-black transition-all duration-500 uppercase tracking-widest text-[9px] italic border border-white/5 hover:border-red-500/30"
+                                        >
+                                            Terminate Sync
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}
