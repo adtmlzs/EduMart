@@ -9,24 +9,23 @@ import {
 } from 'lucide-react';
 
 const AuthLayout = ({ title, subtitle, children, onSubmit, onBack, error, loading, ctaText = "Establish Identity" }) => (
-    <div className="min-h-screen bg-white flex items-stretch overflow-hidden font-outfit">
-        {/* Extreme Minimalist Left Pane */}
-        <div className="hidden lg:flex lg:w-[40%] bg-indigo-950 relative flex-col justify-between p-20 overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row items-stretch overflow-hidden font-outfit">
+        {/* Extreme Minimalist Left Pane - Hidden/Mobile Header on small screens */}
+        <div className="lg:w-[40%] bg-indigo-950 relative flex flex-row lg:flex-col justify-between p-6 md:p-12 lg:p-20 overflow-hidden shrink-0">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_0%_0%,_rgba(79,70,229,0.15)_0%,_transparent_50%)]"></div>
-            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_100%_100%,_rgba(79,70,229,0.1)_0%,_transparent_50%)]"></div>
 
             <div className="relative z-10">
-                <div onClick={onBack} className="cursor-pointer group inline-flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all duration-500">
-                        <ChevronLeft className="h-5 w-5 text-white/50 group-hover:text-white" />
+                <div onClick={onBack} className="cursor-pointer group inline-flex items-center space-x-3 lg:space-x-4">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all duration-500">
+                        <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5 text-white/50 group-hover:text-white" />
                     </div>
-                    <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] italic group-hover:text-white/70 transition-colors">Portal Return</span>
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] italic group-hover:text-white/70 transition-colors hidden sm:inline-block">Portal Return</span>
                 </div>
             </div>
 
-            <div className="relative z-10">
+            <div className="relative z-10 mt-auto hidden lg:block">
                 <div className="w-20 h-1 bg-primary-500 mb-10"></div>
-                <h2 className="text-7xl font-black text-white italic uppercase tracking-tighter leading-none mb-6">
+                <h2 className="text-5xl xl:text-7xl font-black text-white italic uppercase tracking-tighter leading-none mb-6">
                     Identity <br /><span className="text-primary-500">Protocol.</span>
                 </h2>
                 <p className="text-primary-100/30 text-sm font-medium italic tracking-widest max-w-xs leading-relaxed">
@@ -34,51 +33,54 @@ const AuthLayout = ({ title, subtitle, children, onSubmit, onBack, error, loadin
                 </p>
             </div>
 
-            <div className="relative z-10 flex items-center space-x-6">
-                <div className="flex -space-x-3">
+            <div className="relative z-10 flex items-center space-x-6 lg:mt-0">
+                <div className="lg:hidden">
+                    <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">EduMart.</h2>
+                </div>
+                <div className="hidden lg:flex -space-x-3">
                     {[1, 2, 3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-indigo-950 bg-indigo-900/50 backdrop-blur-md"></div>)}
                 </div>
-                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] italic leading-none">Global Nodes Active</span>
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] italic leading-none hidden lg:block">Global Nodes Active</span>
             </div>
         </div>
 
         {/* Ultra-Clean Right Pane */}
-        <div className="flex-1 flex flex-col justify-center px-10 md:px-24 lg:px-32 py-20 relative bg-[#FAFAFB]">
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-20 lg:px-32 py-12 md:py-20 relative bg-[#FAFAFB] overflow-y-auto">
             <div className="max-w-xl w-full mx-auto">
-                <div className="mb-16">
-                    <h3 className="text-6xl md:text-8xl font-black text-indigo-950 tracking-tighter uppercase italic leading-[0.85] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="mb-10 lg:mb-16">
+                    <h3 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-indigo-950 tracking-tighter uppercase italic leading-[0.85] mb-4 lg:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {title}
                     </h3>
-                    <p className="text-gray-400 text-lg font-medium italic animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-100">{subtitle}</p>
+                    <p className="text-gray-400 text-base md:text-lg font-medium italic animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-100">{subtitle}</p>
                 </div>
 
                 {error && (
-                    <div className="bg-rose-50 border border-rose-100 p-6 rounded-3xl mb-10 flex items-center space-x-4 animate-in zoom-in-95 duration-500">
-                        <div className="w-10 h-10 rounded-2xl bg-rose-500 flex items-center justify-center shrink-0">
-                            <Zap className="h-4 w-4 text-white" />
+                    <div className="bg-rose-50 border border-rose-100 p-5 lg:p-6 rounded-2xl lg:rounded-3xl mb-8 lg:mb-10 flex items-center space-x-4 animate-in zoom-in-95 duration-500">
+                        <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl lg:rounded-2xl bg-rose-500 flex items-center justify-center shrink-0">
+                            <Zap className="h-3 w-3 lg:h-4 lg:w-4 text-white" />
                         </div>
-                        <p className="text-[11px] font-black text-rose-600 uppercase tracking-widest italic leading-tight">{error}</p>
+                        <p className="text-[10px] lg:text-[11px] font-black text-rose-600 uppercase tracking-widest italic leading-tight">{error}</p>
                     </div>
                 )}
 
-                <form onSubmit={onSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-                    <div className="space-y-8">
+                <form onSubmit={onSubmit} className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                    <div className="space-y-6 lg:space-y-8">
                         {children}
                     </div>
 
-                    <div className="pt-6">
+                    <div className="pt-4 lg:pt-6">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full bg-indigo-950 hover:bg-primary-600 text-white py-8 rounded-[2.5rem] font-black shadow-2xl shadow-indigo-200 transition-all duration-700 hover:-translate-y-2 active:scale-[0.98] uppercase tracking-[0.2em] text-xs italic flex items-center justify-center overflow-hidden"
+                            className="group relative w-full bg-indigo-950 hover:bg-primary-600 text-white py-6 md:py-8 rounded-[1.8rem] md:rounded-[2.5rem] font-black shadow-2xl shadow-indigo-200 transition-all duration-700 hover:-translate-y-2 active:scale-[0.98] uppercase tracking-[0.2em] text-[10px] md:text-xs italic flex items-center justify-center overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             {loading ? (
-                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-2 border-white border-t-transparent"></div>
                             ) : (
                                 <div className="flex items-center">
                                     <span>{ctaText}</span>
-                                    <ArrowRight className="h-5 w-5 ml-4 group-hover:translate-x-2 transition-transform duration-500" />
+                                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-3 md:ml-4 group-hover:translate-x-2 transition-transform duration-500" />
                                 </div>
                             )}
                         </button>
@@ -86,8 +88,8 @@ const AuthLayout = ({ title, subtitle, children, onSubmit, onBack, error, loadin
                 </form>
             </div>
 
-            <div className="absolute bottom-10 right-10 opacity-10 pointer-events-none hidden md:block">
-                <span className="text-[10px] font-black text-indigo-950 uppercase tracking-[1em] italic">Encrypted Connection</span>
+            <div className="absolute bottom-6 md:bottom-10 right-10 opacity-5 md:opacity-10 pointer-events-none hidden sm:block">
+                <span className="text-[9px] md:text-[10px] font-black text-indigo-950 uppercase tracking-[0.6em] md:tracking-[1em] italic">Encrypted Connection</span>
             </div>
         </div>
     </div>
@@ -158,23 +160,23 @@ const Landing = () => {
                                 <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary-200">Boutique Student Network</span>
                             </div>
 
-                            <h1 className="text-7xl md:text-9xl font-black text-white tracking-tighter mb-8 italic uppercase leading-[0.8] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                            <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-white tracking-tighter mb-8 italic uppercase leading-[0.8] animate-in fade-in slide-in-from-bottom-8 duration-1000">
                                 Edu<span className="text-primary-500">Mart.</span>
                             </h1>
-                            <p className="text-lg md:text-xl text-primary-100/30 max-w-xl mx-auto font-medium leading-relaxed italic mb-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                            <p className="text-base md:text-xl text-primary-100/30 max-w-xl mx-auto font-medium leading-relaxed italic mb-12 md:mb-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
                                 The essential ecosystem for modern academic exchange. <br />Trade, connect, and elevate your campus journey.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-5 items-center justify-center animate-in fade-in slide-in-from-bottom-16 duration-1000">
+                            <div className="flex flex-col sm:flex-row gap-4 md:gap-5 items-center justify-center animate-in fade-in slide-in-from-bottom-16 duration-1000">
                                 <button
                                     onClick={() => resetForm('student-login')}
-                                    className="w-full sm:w-auto bg-white text-indigo-950 px-12 py-6 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-2xl transition-all duration-500 hover:-translate-y-1 active:scale-95 italic flex items-center justify-center"
+                                    className="w-full sm:w-auto bg-white text-indigo-950 px-8 md:px-12 py-5 md:py-6 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-widest shadow-2xl transition-all duration-500 hover:-translate-y-1 active:scale-95 italic flex items-center justify-center"
                                 >
-                                    Enter Network <ArrowRight className="h-4 w-4 ml-4" />
+                                    Enter Network <ArrowRight className="h-4 w-4 ml-3 md:ml-4" />
                                 </button>
                                 <button
                                     onClick={() => resetForm('school-login')}
-                                    className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-12 py-6 rounded-2xl font-black text-[11px] uppercase tracking-widest backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 active:scale-95 italic"
+                                    className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 md:px-12 py-5 md:py-6 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-widest backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 active:scale-95 italic text-center"
                                 >
                                     Institutional Node
                                 </button>
