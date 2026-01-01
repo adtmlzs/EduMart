@@ -147,7 +147,7 @@ app.post('/api/auth/register-student', async (req, res) => {
 
         res.status(201).json({
             token,
-            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: 0, house: user.house, schoolCode: school.uniqueCode }
+            user: { id: user._id, name: user.name, email: user.email, role: 'student', schoolId: user.schoolId, points: user.points, house: user.house, schoolCode: school.uniqueCode }
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
