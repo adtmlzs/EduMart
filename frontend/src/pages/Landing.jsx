@@ -8,56 +8,86 @@ import {
     ChevronLeft, Activity
 } from 'lucide-react';
 
-const AuthLayout = ({ title, subtitle, children, onSubmit, onBack, error, loading }) => (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row overflow-hidden font-outfit">
-        {/* Simplified Left Pane */}
-        <div className="hidden md:flex md:w-1/3 bg-indigo-950 relative items-center justify-center p-12">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(79,70,229,0.1)_0%,_transparent_70%)]"></div>
-            <div className="relative z-10 text-center">
-                <div className="bg-white/5 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-10 border border-white/10 backdrop-blur-xl">
-                    <Sparkles className="h-8 w-8 text-primary-400" />
+const AuthLayout = ({ title, subtitle, children, onSubmit, onBack, error, loading, ctaText = "Establish Identity" }) => (
+    <div className="min-h-screen bg-white flex items-stretch overflow-hidden font-outfit">
+        {/* Extreme Minimalist Left Pane */}
+        <div className="hidden lg:flex lg:w-[40%] bg-indigo-950 relative flex-col justify-between p-20 overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_0%_0%,_rgba(79,70,229,0.15)_0%,_transparent_50%)]"></div>
+            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_100%_100%,_rgba(79,70,229,0.1)_0%,_transparent_50%)]"></div>
+
+            <div className="relative z-10">
+                <div onClick={onBack} className="cursor-pointer group inline-flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all duration-500">
+                        <ChevronLeft className="h-5 w-5 text-white/50 group-hover:text-white" />
+                    </div>
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] italic group-hover:text-white/70 transition-colors">Portal Return</span>
                 </div>
-                <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">EduMart.</h2>
-                <p className="text-primary-100/30 text-xs font-medium italic tracking-widest uppercase">The Sovereign Academic Network</p>
+            </div>
+
+            <div className="relative z-10">
+                <div className="w-20 h-1 bg-primary-500 mb-10"></div>
+                <h2 className="text-7xl font-black text-white italic uppercase tracking-tighter leading-none mb-6">
+                    Identity <br /><span className="text-primary-500">Protocol.</span>
+                </h2>
+                <p className="text-primary-100/30 text-sm font-medium italic tracking-widest max-w-xs leading-relaxed">
+                    Secure institutional access layer for the EduMart sovereign network.
+                </p>
+            </div>
+
+            <div className="relative z-10 flex items-center space-x-6">
+                <div className="flex -space-x-3">
+                    {[1, 2, 3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-indigo-950 bg-indigo-900/50 backdrop-blur-md"></div>)}
+                </div>
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] italic leading-none">Global Nodes Active</span>
             </div>
         </div>
 
-        {/* Minimalistic Right Pane */}
-        <div className="flex-1 flex flex-col justify-center p-8 md:p-24 relative bg-gray-50/30">
-            <button
-                onClick={onBack}
-                className="absolute top-10 left-10 p-3 text-gray-400 hover:text-indigo-950 transition-all hover:-translate-x-1"
-            >
-                <ChevronLeft className="h-6 w-6" />
-            </button>
-
-            <div className="max-w-md w-full mx-auto">
-                <div className="mb-12">
-                    <h3 className="text-5xl font-black text-indigo-950 tracking-tighter uppercase italic mb-2">{title}</h3>
-                    <p className="text-gray-400 text-sm font-medium italic">{subtitle}</p>
+        {/* Ultra-Clean Right Pane */}
+        <div className="flex-1 flex flex-col justify-center px-10 md:px-24 lg:px-32 py-20 relative bg-[#FAFAFB]">
+            <div className="max-w-xl w-full mx-auto">
+                <div className="mb-16">
+                    <h3 className="text-6xl md:text-8xl font-black text-indigo-950 tracking-tighter uppercase italic leading-[0.85] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        {title}
+                    </h3>
+                    <p className="text-gray-400 text-lg font-medium italic animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-100">{subtitle}</p>
                 </div>
 
                 {error && (
-                    <div className="bg-rose-50 border border-rose-100 p-5 rounded-2xl mb-8 flex items-center space-x-3 animate-in fade-in slide-in-from-top-2">
-                        <Zap className="h-4 w-4 text-rose-500" />
-                        <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest italic">{error}</p>
+                    <div className="bg-rose-50 border border-rose-100 p-6 rounded-3xl mb-10 flex items-center space-x-4 animate-in zoom-in-95 duration-500">
+                        <div className="w-10 h-10 rounded-2xl bg-rose-500 flex items-center justify-center shrink-0">
+                            <Zap className="h-4 w-4 text-white" />
+                        </div>
+                        <p className="text-[11px] font-black text-rose-600 uppercase tracking-widest italic leading-tight">{error}</p>
                     </div>
                 )}
 
-                <form onSubmit={onSubmit} className="space-y-6">
-                    {children}
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-indigo-950 hover:bg-primary-600 text-white py-6 rounded-2xl font-black shadow-2xl shadow-indigo-100 transition-all duration-500 hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-[10px] italic mt-8 flex items-center justify-center"
-                    >
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                        ) : (
-                            <><span>Establish Identity</span> <ArrowRight className="h-4 w-4 ml-3" /></>
-                        )}
-                    </button>
+                <form onSubmit={onSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                    <div className="space-y-8">
+                        {children}
+                    </div>
+
+                    <div className="pt-6">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="group relative w-full bg-indigo-950 hover:bg-primary-600 text-white py-8 rounded-[2.5rem] font-black shadow-2xl shadow-indigo-200 transition-all duration-700 hover:-translate-y-2 active:scale-[0.98] uppercase tracking-[0.2em] text-xs italic flex items-center justify-center overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                            {loading ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            ) : (
+                                <div className="flex items-center">
+                                    <span>{ctaText}</span>
+                                    <ArrowRight className="h-5 w-5 ml-4 group-hover:translate-x-2 transition-transform duration-500" />
+                                </div>
+                            )}
+                        </button>
+                    </div>
                 </form>
+            </div>
+
+            <div className="absolute bottom-10 right-10 opacity-10 pointer-events-none hidden md:block">
+                <span className="text-[10px] font-black text-indigo-950 uppercase tracking-[1em] italic">Encrypted Connection</span>
             </div>
         </div>
     </div>
@@ -167,34 +197,41 @@ const Landing = () => {
                     loading={loading}
                     onSubmit={(e) => { e.preventDefault(); handleAction(() => login(formData.email, formData.password, 'student'), 'login'); }}
                 >
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Network Address</label>
+                    <div className="space-y-8">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Network Address</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                 placeholder="name@scholar.edu"
                                 required
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Access Key</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Access Key</label>
                             <input
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                 placeholder="••••••••"
                                 required
                             />
                         </div>
-                        <p className="text-[9px] font-black text-gray-300 uppercase italic text-center pt-2">
-                            New Node? <button type="button" onClick={() => resetForm('student-register')} className="text-primary-500 hover:text-indigo-950 transition-colors">Register Identity</button>
-                        </p>
+                        <div className="pt-10 border-t border-gray-50 flex flex-col items-center space-y-4">
+                            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">New Node in the Network?</p>
+                            <button
+                                type="button"
+                                onClick={() => resetForm('student-register')}
+                                className="text-lg font-black text-primary-500 hover:text-indigo-950 transition-all duration-500 uppercase italic tracking-tighter"
+                            >
+                                Register Identity.
+                            </button>
+                        </div>
                     </div>
                 </AuthLayout>
             )}
@@ -208,34 +245,41 @@ const Landing = () => {
                     loading={loading}
                     onSubmit={(e) => { e.preventDefault(); handleAction(() => login(formData.email, formData.password, 'school'), 'login'); }}
                 >
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Admin Identifier</label>
+                    <div className="space-y-8">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Admin Identifier</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                 placeholder="admin@academy.org"
                                 required
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Protocol Key</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Protocol Key</label>
                             <input
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-5 px-8 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                 placeholder="••••••••"
                                 required
                             />
                         </div>
-                        <p className="text-[9px] font-black text-gray-300 uppercase italic text-center pt-2">
-                            Unregistered School? <button type="button" onClick={() => resetForm('school-register')} className="text-primary-500 hover:text-indigo-950 transition-colors">Initial Setup</button>
-                        </p>
+                        <div className="pt-10 border-t border-gray-50 flex flex-col items-center space-y-4">
+                            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">Unregistered Institution?</p>
+                            <button
+                                type="button"
+                                onClick={() => resetForm('school-register')}
+                                className="text-lg font-black text-primary-500 hover:text-indigo-950 transition-all duration-500 uppercase italic tracking-tighter"
+                            >
+                                Initial Setup.
+                            </button>
+                        </div>
                     </div>
                 </AuthLayout>
             )}
@@ -244,32 +288,33 @@ const Landing = () => {
                 <AuthLayout
                     title="Registration."
                     subtitle="Initialize your scholar footprint."
+                    ctaText="Establish Identity"
                     onBack={() => resetForm('student-login')}
                     error={error}
                     loading={loading}
                     onSubmit={(e) => { e.preventDefault(); handleAction(() => registerStudent(formData), 'register'); }}
                 >
-                    <div className="space-y-5">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Full Name</label>
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Full Name</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                     placeholder="Jane Doe"
                                     required
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">House Unit</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">House Unit</label>
                                 <select
                                     name="house"
                                     value={formData.house}
                                     onChange={handleInputChange}
-                                    className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner cursor-pointer"
                                 >
                                     <option value="Red">Red</option>
                                     <option value="Blue">Blue</option>
@@ -279,41 +324,41 @@ const Landing = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Academic Email</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Academic Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                 placeholder="name@scholar.edu"
                                 required
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Password</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Password</label>
                                 <input
                                     type="password"
                                     name="password"
                                     value={formData.password}
                                     onChange={handleInputChange}
-                                    className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm"
+                                    className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-gray-900 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner"
                                     placeholder="••••••••"
                                     required
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 italic">Unique Code</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 italic">Unique School Code</label>
                                 <input
                                     type="text"
                                     name="schoolCode"
                                     value={formData.schoolCode}
                                     onChange={handleInputChange}
-                                    className="w-full bg-white border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-sm uppercase tracking-widest"
-                                    placeholder="UNIQUE CODE:"
+                                    className="w-full bg-white border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner uppercase tracking-[0.3em]"
+                                    placeholder="DPS-2025"
                                     required
                                 />
                             </div>
