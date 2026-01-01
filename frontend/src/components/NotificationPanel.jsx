@@ -72,14 +72,14 @@ const NotificationPanel = () => {
 
             {showDropdown && (
                 <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)}></div>
-                    <div className="absolute right-0 mt-4 w-96 bg-white rounded-[2rem] shadow-2xl z-50 border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-                        <div className="bg-gray-50/50 px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="text-xl font-black text-gray-900 tracking-tight">Notifications</h3>
-                            <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest">{unreadCount} New</span>
+                    <div className="fixed inset-0 z-40 bg-black/5 lg:bg-transparent" onClick={() => setShowDropdown(false)}></div>
+                    <div className="fixed md:absolute left-4 right-4 md:left-auto md:right-0 mt-4 md:w-96 bg-white rounded-[2rem] shadow-2xl z-50 border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 origin-top-right">
+                        <div className="bg-gray-50/50 px-6 md:px-8 py-5 md:py-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="text-lg md:text-xl font-black text-gray-900 tracking-tight italic uppercase">Intel.</h3>
+                            <span className="text-[9px] font-black text-primary-600 uppercase tracking-widest">{unreadCount} Active</span>
                         </div>
 
-                        <div className="max-h-[450px] overflow-y-auto">
+                        <div className="max-h-[60vh] md:max-h-[450px] overflow-y-auto">
                             {notifications.length === 0 ? (
                                 <div className="p-12 text-center">
                                     <Bell className="h-12 w-12 text-gray-200 mx-auto mb-4" />
