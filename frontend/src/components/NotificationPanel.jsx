@@ -30,7 +30,7 @@ const NotificationPanel = () => {
 
     const markAsRead = async (id) => {
         try {
-            await API.put(`/notifications/${id}/read`);
+            await API.put(`/notifications/${id}/read`, { userId: user.id });
             fetchNotifications();
         } catch (error) {
             console.error('Error marking as read:', error);

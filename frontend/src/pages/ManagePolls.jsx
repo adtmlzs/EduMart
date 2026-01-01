@@ -1,3 +1,11 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import API from '../api';
+import {
+    Plus, Sparkles, BarChart3, Clock,
+    X, Zap, RefreshCw, XCircle
+} from 'lucide-react';
+
 const ManagePolls = () => {
     const { user } = useAuth();
     const [polls, setPolls] = useState([]);
@@ -97,12 +105,12 @@ const ManagePolls = () => {
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-indigo-950 h-20 px-10 rounded-[2rem] flex items-center space-x-4 shadow-2xl shadow-indigo-950/20 hover:bg-primary-600 hover:-translate-y-2 transition-all duration-500 group"
+                    className="bg-indigo-950 h-16 md:h-20 px-8 md:px-10 rounded-[1.5rem] md:rounded-[2rem] flex items-center space-x-4 shadow-2xl shadow-indigo-950/20 hover:bg-primary-600 hover:-translate-y-2 transition-all duration-500 group"
                 >
-                    <div className="bg-white/10 p-2.5 rounded-xl group-hover:rotate-90 transition-transform">
-                        <Plus size={18} className="text-white" />
+                    <div className="bg-white/10 p-2 md:p-2.5 rounded-xl group-hover:rotate-90 transition-transform">
+                        <Plus size={16} className="text-white" />
                     </div>
-                    <span className="text-white font-black text-[11px] uppercase tracking-widest italic">Initiate Ballot</span>
+                    <span className="text-white font-black text-[10px] md:text-[11px] uppercase tracking-widest italic">Initiate Ballot</span>
                 </button>
             </div>
 
@@ -188,24 +196,24 @@ const ManagePolls = () => {
                 <div className="fixed inset-0 bg-indigo-950/80 backdrop-blur-3xl flex items-center justify-center z-[100] p-6 sm:p-10 animate-in fade-in duration-500">
                     <div className="bg-white rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-in slide-in-from-bottom-12 duration-700 scale-95 md:scale-100">
                         {/* Modal Header */}
-                        <div className="bg-indigo-950 p-12 text-white flex items-center justify-between relative overflow-hidden">
+                        <div className="bg-indigo-950 p-8 md:p-12 text-white flex items-center justify-between relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                             <div className="relative z-10">
-                                <div className="flex items-center space-x-3 mb-3">
-                                    <Sparkles size={16} className="text-primary-400" />
-                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.3em] italic">Network Broadcast</span>
+                                <div className="flex items-center space-x-3 mb-2 md:mb-3">
+                                    <Sparkles size={14} className="text-primary-400" />
+                                    <span className="text-[8px] md:text-[10px] font-black text-primary-400 uppercase tracking-[0.3em] italic">Network Broadcast</span>
                                 </div>
-                                <h2 className="text-5xl font-black tracking-tighter italic uppercase leading-none">Initiate <br />Ballot.</h2>
+                                <h2 className="text-4xl md:text-5xl font-black tracking-tighter italic uppercase leading-none">Initiate <br />Ballot.</h2>
                             </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="bg-white/10 h-16 w-16 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all group active:scale-95"
+                                className="bg-white/10 h-12 w-12 md:h-16 md:w-16 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all group active:scale-95"
                             >
-                                <X size={24} className="group-hover:rotate-90 transition-transform" />
+                                <X size={20} className="group-hover:rotate-90 transition-transform" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-12 space-y-8 overflow-y-auto custom-scrollbar no-scrollbar">
+                        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar no-scrollbar">
                             <div className="space-y-3">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 italic flex items-center">
                                     Primary Question <span className="text-primary-500 ml-1 opacity-50">*</span>
@@ -267,17 +275,17 @@ const ManagePolls = () => {
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-6 pt-6">
+                            <div className="flex flex-col sm:flex-row items-stretch gap-4 pt-6">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-indigo-950 text-white h-24 rounded-[2.5rem] font-black uppercase tracking-widest italic shadow-2xl shadow-indigo-950/20 hover:bg-primary-600 hover:-translate-y-2 transition-all duration-500 active:scale-95"
+                                    className="flex-1 bg-indigo-950 text-white h-20 md:h-24 rounded-[1.8rem] md:rounded-[2.5rem] font-black uppercase tracking-widest italic shadow-2xl shadow-indigo-950/20 hover:bg-primary-600 hover:-translate-y-2 transition-all duration-500 active:scale-95"
                                 >
                                     Broadcast Ballot
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-10 h-24 bg-white border-2 border-gray-100 text-indigo-950 rounded-[2.5rem] font-black uppercase tracking-widest italic hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95"
+                                    className="px-8 md:px-10 h-20 md:h-24 bg-white border-2 border-gray-100 text-indigo-950 rounded-[1.8rem] md:rounded-[2.5rem] font-black uppercase tracking-widest italic hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95"
                                 >
                                     Abort
                                 </button>

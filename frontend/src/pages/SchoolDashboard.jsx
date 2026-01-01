@@ -6,7 +6,7 @@ import {
     LayoutDashboard, UserX, UserCheck,
     MessageSquare, Activity, ChevronDown,
     ChevronUp, RefreshCw, XCircle, ChevronRight,
-    TrendingUp, Award, Clock, Sparkles, BarChart3
+    TrendingUp, Award, Clock, Sparkles, BarChart3, Menu
 } from 'lucide-react';
 import ManagePolls from './ManagePolls';
 
@@ -17,12 +17,17 @@ const SchoolDashboard = () => {
     const [students, setStudents] = useState([]);
     const [clubs, setClubs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedClub, setExpandedClub] = useState(null);
 
     useEffect(() => {
         if (user) fetchData();
     }, [activeTab, user]);
+
+    useEffect(() => {
+        setSidebarOpen(false); // Close sidebar when switching tabs on mobile
+    }, [activeTab]);
 
     const fetchData = async () => {
         if (!user) return;
@@ -78,9 +83,25 @@ const SchoolDashboard = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] flex flex-col md:flex-row h-screen overflow-hidden">
+        <div className="min-h-screen bg-[#FAFAFB] flex flex-col md:flex-row h-screen overflow-hidden relative">
+            {/* Mobile Header Toggle */}
+            <div className="md:hidden bg-indigo-950 p-6 flex items-center justify-between z-50">
+                <div className="flex items-center space-x-3">
+                    <Shield className="h-6 w-6 text-primary-500" />
+                    <span className="text-xl font-black text-white italic uppercase tracking-tighter">Oversight.</span>
+                </div>
+                <button
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="p-3 bg-white/5 rounded-xl text-white"
+                >
+                    <Menu className="h-6 w-6" />
+                </button>
+            </div>
+
             {/* Sidebar Navigation */}
-            <div className="w-full md:w-80 bg-indigo-950 text-white flex flex-col z-30 relative overflow-hidden h-full">
+            <div className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 md:hidden ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
+
+            <div className={`w-80 bg-indigo-950 text-white flex flex-col z-50 absolute md:relative h-full transition-transform duration-500 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
 
                 <div className="p-10 relative z-10 flex-1 overflow-y-auto no-scrollbar">
@@ -140,7 +161,7 @@ const SchoolDashboard = () => {
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary-500 animate-pulse"></div>
                                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] italic leading-none">Global Management Protocol</span>
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black text-indigo-950 tracking-tighter uppercase italic leading-none">
+                            <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-indigo-950 tracking-tighter uppercase italic leading-none">
                                 {activeTab === 'overview' ? 'Overview.' : activeTab === 'students' ? 'Students.' : activeTab === 'clubs' ? 'Clubs.' : 'Ballots.'}
                             </h1>
                         </div>
@@ -168,14 +189,14 @@ const SchoolDashboard = () => {
                                             { label: 'Market Assets', val: stats.totalItems, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', line: 'Trading Flow Status' },
                                             { label: 'Daily Traces', val: stats.confessionsToday, icon: MessageSquare, color: 'text-rose-600', bg: 'bg-rose-50', line: 'Campus Sentiment Index' }
                                         ].map((s, i) => (
-                                            <div key={i} className="bg-white p-10 rounded-[3.5rem] shadow-2xl shadow-indigo-950/5 border border-transparent hover:border-gray-100 transition-all duration-500 group">
-                                                <div className={`${s.bg} ${s.color} h-14 w-14 rounded-[1.8rem] flex items-center justify-center mb-8 border-4 border-white shadow-xl transition-all duration-500 group-hover:rotate-12 group-hover:scale-110`}>
-                                                    <s.icon size={22} strokeWidth={2.5} />
+                                            <div key={i} className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl shadow-indigo-950/5 border border-transparent hover:border-gray-100 transition-all duration-500 group">
+                                                <div className={`${s.bg} ${s.color} h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] md:rounded-[1.8rem] flex items-center justify-center mb-6 md:mb-8 border-4 border-white shadow-xl transition-all duration-500 group-hover:rotate-12 group-hover:scale-110`}>
+                                                    <s.icon size={20} className="md:w-[22px]" strokeWidth={2.5} />
                                                 </div>
-                                                <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2 italic ml-1">{s.label}</h3>
-                                                <p className="text-6xl font-black text-indigo-950 tracking-tighter mb-4 italic leading-none">{s.val}</p>
+                                                <h3 className="text-gray-400 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-2 italic ml-1">{s.label}</h3>
+                                                <p className="text-4xl md:text-6xl font-black text-indigo-950 tracking-tighter mb-4 italic leading-none">{s.val}</p>
                                                 <div className="w-8 h-1 bg-gray-100 rounded-full group-hover:w-full transition-all duration-700"></div>
-                                                <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-6 italic ml-1">{s.line}</p>
+                                                <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest mt-4 md:mt-6 italic ml-1">{s.line}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -186,16 +207,16 @@ const SchoolDashboard = () => {
                                                 <Activity size={200} />
                                             </div>
                                             <div className="relative z-10">
-                                                <div className="flex items-center justify-between mb-16">
-                                                    <div className="flex items-center space-x-5">
-                                                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
-                                                            <Activity size={20} />
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 md:mb-16 gap-6">
+                                                    <div className="flex items-center space-x-4 md:space-x-5">
+                                                        <div className="p-2.5 md:p-3 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl">
+                                                            <Activity size={18} className="md:w-5" />
                                                         </div>
-                                                        <h2 className="text-3xl font-black text-indigo-950 tracking-tighter uppercase italic">Institutional Trace Audit</h2>
+                                                        <h2 className="text-xl md:text-3xl font-black text-indigo-950 tracking-tighter uppercase italic leading-none">Institutional Trace Audit</h2>
                                                     </div>
-                                                    <div className="flex items-center space-x-3 bg-emerald-50 px-5 py-2 rounded-full border border-emerald-100">
+                                                    <div className="flex items-center space-x-3 bg-emerald-50 px-4 md:px-5 py-2 rounded-full border border-emerald-100 w-fit">
                                                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest italic leading-none">Live Sync active</span>
+                                                        <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest italic leading-none">Live Sync active</span>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-6">
@@ -218,20 +239,20 @@ const SchoolDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <div className="bg-indigo-950 rounded-[4rem] p-12 text-white shadow-2xl shadow-indigo-950/20 flex flex-col items-center justify-center text-center relative overflow-hidden group min-h-[500px]">
+                                        <div className="bg-indigo-950 rounded-[3rem] md:rounded-[4rem] p-8 md:p-12 text-white shadow-2xl shadow-indigo-950/20 flex flex-col items-center justify-center text-center relative overflow-hidden group min-h-[400px] md:min-h-[500px]">
                                             <div className="absolute inset-0 opacity-10 pointer-events-none">
                                                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,_var(--tw-gradient-stops))] from-primary-500 via-transparent to-transparent"></div>
                                             </div>
-                                            <Shield className="absolute -top-10 -right-10 h-80 w-80 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-700" />
+                                            <Shield className="absolute -top-10 -right-10 h-64 md:h-80 w-64 md:w-80 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-700" />
                                             <div className="relative z-10 w-full">
-                                                <div className="bg-white/10 h-24 w-24 rounded-[2.5rem] flex items-center justify-center mb-10 mx-auto border border-white/10 backdrop-blur-xl shadow-inner">
-                                                    <Award size={40} className="text-primary-400 italic" />
+                                                <div className="bg-white/10 h-20 w-20 md:h-24 md:w-24 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center mb-8 md:mb-10 mx-auto border border-white/10 backdrop-blur-xl shadow-inner">
+                                                    <Award size={32} className="md:w-10 text-primary-400 italic" />
                                                 </div>
-                                                <h3 className="text-5xl font-black mb-6 uppercase italic tracking-tighter leading-none">Institutional <br /><span className="text-primary-500">Volume.</span></h3>
-                                                <p className="text-primary-100/40 font-medium text-sm leading-relaxed mb-12 max-w-[220px] mx-auto italic">
+                                                <h3 className="text-3xl md:text-5xl font-black mb-4 md:mb-6 uppercase italic tracking-tighter leading-none">Institutional <br /><span className="text-primary-500">Volume.</span></h3>
+                                                <p className="text-primary-100/40 font-medium text-[11px] md:text-sm leading-relaxed mb-8 md:mb-12 max-w-[220px] mx-auto italic">
                                                     Macro-engagement levels exceed network baselines by 24.8% this cycle.
                                                 </p>
-                                                <button className="w-full bg-white text-indigo-950 py-6 rounded-[2.2rem] font-black text-[10px] uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all duration-500 shadow-2xl shadow-black/20 italic">
+                                                <button className="w-full bg-white text-indigo-950 py-5 md:py-6 rounded-[1.8rem] md:rounded-[2.2rem] font-black text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all duration-500 shadow-2xl shadow-black/20 italic">
                                                     Access Analytics Console
                                                 </button>
                                             </div>
@@ -261,7 +282,7 @@ const SchoolDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="overflow-x-auto">
+                                    <div className="overflow-x-auto hidden lg:block">
                                         <table className="w-full text-left">
                                             <thead>
                                                 <tr className="bg-white border-b border-gray-50">
@@ -315,6 +336,43 @@ const SchoolDashboard = () => {
                                             </tbody>
                                         </table>
                                     </div>
+
+                                    {/* Mobile Card View */}
+                                    <div className="lg:hidden p-6 space-y-4">
+                                        {filteredStudents.map(student => (
+                                            <div key={student._id} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg border-2 border-white shadow-sm uppercase italic">
+                                                            {student.name.charAt(0)}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-black text-indigo-950 tracking-tighter text-base italic uppercase leading-none mb-1">{student.name}</p>
+                                                            <p className="text-[8px] font-black text-gray-300 tracking-widest uppercase italic">{student.email}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`h-2.5 w-2.5 rounded-full ${student.isActive ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center">
+                                                        <span className="text-[8px] font-black text-gray-400 uppercase mb-1">Score Matrix</span>
+                                                        <span className="text-xl font-black text-indigo-950 italic">{student.points}</span>
+                                                    </div>
+                                                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center">
+                                                        <span className="text-[8px] font-black text-gray-400 uppercase mb-1">Alignment</span>
+                                                        <span className="text-[10px] font-black text-indigo-950 italic uppercase">{student.house}</span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleBanUser(student._id)}
+                                                    className={`w-full py-4 rounded-xl font-black text-[9px] uppercase tracking-widest flex items-center justify-center space-x-2 ${student.isActive ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}
+                                                >
+                                                    {student.isActive ? <Ban size={12} /> : <UserCheck size={12} />}
+                                                    <span>{student.isActive ? 'Enact Suspension' : 'Restore Signal'}</span>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
@@ -326,13 +384,13 @@ const SchoolDashboard = () => {
                                                 <Users size={160} />
                                             </div>
 
-                                            <div className="p-10 border-b border-gray-50 flex items-center justify-between bg-gray-50/30 backdrop-blur-sm relative z-10">
+                                            <div className="p-6 md:p-10 border-b border-gray-50 flex items-center justify-between bg-gray-50/30 backdrop-blur-sm relative z-10">
                                                 <div className="flex items-center space-x-6">
-                                                    <div className="h-24 w-24 rounded-[2.5rem] bg-indigo-950 text-white flex items-center justify-center font-black text-3xl border-4 border-white shadow-2xl shadow-indigo-950/20 uppercase italic group-hover:rotate-12 transition duration-700">
+                                                    <div className="h-16 w-16 md:h-24 md:w-24 rounded-[1.8rem] md:rounded-[2.5rem] bg-indigo-950 text-white flex items-center justify-center font-black text-2xl md:text-3xl border-4 border-white shadow-2xl shadow-indigo-950/20 uppercase italic group-hover:rotate-12 transition duration-700">
                                                         {club.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-3xl font-black text-indigo-950 tracking-tighter uppercase italic leading-none mb-2">{club.name}</h3>
+                                                        <h3 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tighter uppercase italic leading-none mb-2">{club.name}</h3>
                                                         <div className="flex items-center space-x-2">
                                                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest italic">Directorate: </span>
                                                             <span className="text-[10px] font-black text-indigo-600 uppercase italic">{club.createdBy?.name}</span>
@@ -341,31 +399,31 @@ const SchoolDashboard = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="p-10 flex-1 relative z-10">
-                                                <div className="grid grid-cols-2 gap-8 mb-10">
-                                                    <div className="bg-gray-50 p-7 rounded-[2.5rem] border border-gray-100 text-center relative overflow-hidden group/tile transition-all hover:bg-white hover:shadow-xl">
-                                                        <p className="text-4xl font-black text-indigo-950 tracking-tighter italic leading-none mb-2">{club.members.length}</p>
-                                                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Member Registry</p>
+                                            <div className="p-6 md:p-10 flex-1 relative z-10">
+                                                <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-10">
+                                                    <div className="bg-gray-50 p-4 md:p-7 rounded-[1.8rem] md:rounded-[2.5rem] border border-gray-100 text-center relative overflow-hidden group/tile transition-all hover:bg-white hover:shadow-xl">
+                                                        <p className="text-2xl md:text-4xl font-black text-indigo-950 tracking-tighter italic leading-none mb-2">{club.members.length}</p>
+                                                        <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Member Registry</p>
                                                     </div>
-                                                    <div className="bg-gray-50 p-7 rounded-[2.5rem] border border-gray-100 text-center relative overflow-hidden group/tile transition-all hover:bg-white hover:shadow-xl">
-                                                        <p className="text-4xl font-black text-indigo-950 tracking-tighter italic leading-none mb-2">12</p>
-                                                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Recorded Flux</p>
+                                                    <div className="bg-gray-50 p-4 md:p-7 rounded-[1.8rem] md:rounded-[2.5rem] border border-gray-100 text-center relative overflow-hidden group/tile transition-all hover:bg-white hover:shadow-xl">
+                                                        <p className="text-2xl md:text-4xl font-black text-indigo-950 tracking-tighter italic leading-none mb-2">12</p>
+                                                        <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Recorded Flux</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center justify-between gap-6">
+                                                <div className="flex items-center justify-between gap-4 md:gap-6">
                                                     <button
                                                         onClick={() => setExpandedClub(expandedClub === club._id ? null : club._id)}
-                                                        className={`flex-1 flex items-center justify-center space-x-4 py-6 rounded-[2.2rem] font-black text-[10px] uppercase tracking-widest transition-all duration-500 italic shadow-2xl ${expandedClub === club._id ? 'bg-indigo-950 text-white shadow-indigo-950/20' : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white shadow-primary-500/10'}`}
+                                                        className={`flex-1 flex items-center justify-center space-x-3 md:space-x-4 py-5 md:py-6 rounded-[1.8rem] md:rounded-[2.2rem] font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all duration-500 italic shadow-2xl ${expandedClub === club._id ? 'bg-indigo-950 text-white shadow-indigo-950/20' : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white shadow-primary-500/10'}`}
                                                     >
-                                                        <Activity size={16} />
+                                                        <Activity size={14} className="md:w-4" />
                                                         <span>{expandedClub === club._id ? 'Close Audit' : 'Initiate Audit'}</span>
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteClub(club._id)}
-                                                        className="p-6 bg-rose-50 rounded-[2.2rem] text-rose-500 hover:bg-rose-600 hover:text-white transition-all shadow-xl shadow-rose-950/5 duration-500 active:scale-95"
+                                                        className="p-5 md:p-6 bg-rose-50 rounded-[1.8rem] md:rounded-[2.2rem] text-rose-500 hover:bg-rose-600 hover:text-white transition-all shadow-xl shadow-rose-950/5 duration-500 active:scale-95"
                                                     >
-                                                        <Trash2 size={20} />
+                                                        <Trash2 size={18} className="md:w-5" />
                                                     </button>
                                                 </div>
                                             </div>

@@ -7,11 +7,19 @@ router.get('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
         const User = require('../models/User');
-        const user = await User.findById(userId);
+        const School = require('../models/School');
 
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        // Find account in either collection
+        let account = await User.findById(userId);
+        let schoolId;
 
-        const schoolId = user.schoolId;
+        if (!account) {
+            account = await School.findById(userId);
+            if (!account) return res.status(404).json({ message: 'Account not found' });
+            schoolId = account._id;
+        } else {
+            schoolId = account.schoolId;
+        }
 
         // Fetch personal notifications AND broadcast notifications for the school
         let notifications = await Notification.find({
@@ -71,9 +79,18 @@ router.put('/mark-all-read/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
         const User = require('../models/User');
-        const user = await User.findById(userId);
+        const School = require('../models/School');
 
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        let account = await User.findById(userId);
+        let schoolId;
+
+        if (!account) {
+            account = await School.findById(userId);
+            if (!account) return res.status(404).json({ message: 'Account not found' });
+            schoolId = account._id;
+        } else {
+            schoolId = account.schoolId;
+        }
 
         // 1. Mark personal notifications
         await Notification.updateMany(
@@ -83,7 +100,7 @@ router.put('/mark-all-read/:userId', async (req, res) => {
 
         // 2. Mark broadcast notifications (add user to readBy)
         await Notification.updateMany(
-            { schoolId: user.schoolId, userId: null, readBy: { $ne: userId } },
+            { schoolId: schoolId, userId: null, readBy: { $ne: userId } },
             { $addToSet: { readBy: userId } }
         );
 
