@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
-import { MessageCircle, Send, Ghost, Sparkles, TrendingUp, History, Shield, Zap, Lock } from 'lucide-react';
+import { MessageCircle, Send, Ghost, Sparkles, TrendingUp, History, Shield, Zap, Lock, ArrowBigUp, ArrowBigDown } from 'lucide-react';
 
 const Confessions = () => {
     const { user } = useAuth();
@@ -22,6 +22,19 @@ const Confessions = () => {
             console.error('Error fetching confessions:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleVote = async (confessionId, type) => {
+        try {
+            const response = await API.post(`/confessions/${confessionId}/vote`, { type });
+            const { voteScore, upvotes, downvotes } = response.data;
+
+            setConfessions(confessions.map(c =>
+                c._id === confessionId ? { ...c, voteScore, upvotes, downvotes } : c
+            ));
+        } catch (error) {
+            console.error('Vote Error:', error);
         }
     };
 
@@ -122,33 +135,59 @@ const Confessions = () => {
                                 <p className="text-gray-400 font-medium italic">Be the first to break the silence.</p>
                             </div>
                         ) : (
-                            confessions.map((c, i) => (
-                                <div key={c._id} className="group relative bg-white p-10 lg:p-12 rounded-[3.5rem] shadow-2xl shadow-indigo-950/5 border border-transparent hover:border-primary-100 transition-all duration-700 hover:-translate-y-2 overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-12 transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-1000">
-                                        <Ghost className="h-16 w-16 text-indigo-50 opacity-10" />
-                                    </div>
-                                    <div className="relative z-10">
-                                        <div className="flex items-center space-x-4 mb-8">
-                                            <div className="h-10 w-10 rounded-[1.2rem] bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-[10px] border border-indigo-100 shadow-inner italic">
-                                                #{confessions.length - i}
-                                            </div>
-                                            <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest italic">Original Whisper</span>
-                                        </div>
-                                        <p className="text-indigo-950 text-2xl lg:text-3xl font-black leading-[1.3] mb-10 italic tracking-tighter">"{c.content}"</p>
+                            confessions.map((c, i) => {
+                                const isUpvoted = c.upvotes?.includes(user.id);
+                                const isDownvoted = c.downvotes?.includes(user.id);
 
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-8 border-t border-gray-50 gap-4">
-                                            <div className="flex items-center space-x-3 text-indigo-300">
-                                                <History size={14} />
-                                                <span className="text-[9px] font-black uppercase tracking-[0.2em] italic">{formatTime(c.createdAt)}</span>
+                                return (
+                                    <div key={c._id} className="group relative bg-white rounded-[3.5rem] shadow-2xl shadow-indigo-950/5 border border-transparent hover:border-primary-100 transition-all duration-700 hover:-translate-y-2 overflow-hidden flex">
+                                        {/* Voting Sidebar */}
+                                        <div className="bg-gray-50/50 w-20 flex flex-col items-center py-10 space-y-4 border-r border-gray-100">
+                                            <button
+                                                onClick={() => handleVote(c._id, 'up')}
+                                                className={`p-2 rounded-xl transition-all ${isUpvoted ? 'bg-orange-100 text-orange-500 shadow-lg scale-110' : 'text-gray-300 hover:text-orange-500 hover:bg-orange-50'}`}
+                                            >
+                                                <ArrowBigUp size={28} fill={isUpvoted ? "currentColor" : "none"} />
+                                            </button>
+                                            <span className={`text-sm font-black italic ${c.voteScore > 0 ? 'text-orange-500' : c.voteScore < 0 ? 'text-indigo-500' : 'text-gray-400'}`}>
+                                                {c.voteScore || 0}
+                                            </span>
+                                            <button
+                                                onClick={() => handleVote(c._id, 'down')}
+                                                className={`p-2 rounded-xl transition-all ${isDownvoted ? 'bg-indigo-100 text-indigo-500 shadow-lg scale-110' : 'text-gray-300 hover:text-indigo-500 hover:bg-indigo-50'}`}
+                                            >
+                                                <ArrowBigDown size={28} fill={isDownvoted ? "currentColor" : "none"} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex-1 p-10 lg:p-12">
+                                            <div className="absolute top-0 right-0 p-12 transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-1000 select-none">
+                                                <Ghost className="h-16 w-16 text-indigo-50 opacity-10" />
                                             </div>
-                                            <div className="flex items-center space-x-2 text-emerald-500/50">
-                                                <Shield size={12} />
-                                                <span className="text-[8px] font-black uppercase italic tracking-widest">Verified Anonymity</span>
+                                            <div className="relative z-10">
+                                                <div className="flex items-center space-x-4 mb-8">
+                                                    <div className="h-10 w-10 rounded-[1.2rem] bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-[10px] border border-indigo-100 shadow-inner italic">
+                                                        #{confessions.length - i}
+                                                    </div>
+                                                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest italic">Original Whisper</span>
+                                                </div>
+                                                <p className="text-indigo-950 text-2xl lg:text-3xl font-black leading-[1.3] mb-10 italic tracking-tighter">"{c.content}"</p>
+
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-8 border-t border-gray-50 gap-4">
+                                                    <div className="flex items-center space-x-3 text-indigo-300">
+                                                        <History size={14} />
+                                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] italic">{formatTime(c.createdAt)}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 text-emerald-500/50">
+                                                        <Shield size={12} />
+                                                        <span className="text-[8px] font-black uppercase italic tracking-widest">Verified Anonymity</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 )}
