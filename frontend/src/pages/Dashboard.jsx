@@ -88,7 +88,7 @@ const Dashboard = () => {
                         <div className="flex items-center space-x-4 bg-white/5 backdrop-blur-3xl rounded-[2.5rem] p-4 border border-white/10 shadow-2xl">
                             <div className="bg-white/10 p-6 rounded-[2rem] border border-white/5 flex flex-col items-center">
                                 <span className="text-[9px] font-black text-primary-300 uppercase tracking-[0.3em] mb-1 italic">Balance</span>
-                                <span className="text-3xl font-black text-white italic tracking-tighter">₹{user.points || 0}</span>
+                                <span className="text-3xl font-black text-white italic tracking-tighter">{user.points || 0} EP</span>
                             </div>
                             <div className="bg-gradient-to-br from-primary-500 to-indigo-600 p-6 rounded-[2rem] shadow-xl flex flex-col items-center min-w-[120px]">
                                 <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.3em] mb-1 italic">Division</span>

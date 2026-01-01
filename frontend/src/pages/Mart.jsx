@@ -251,7 +251,7 @@ const Mart = () => {
                                         )}
                                         <div className="absolute inset-x-4 bottom-4 flex items-center justify-between">
                                             <div className="bg-white/90 backdrop-blur-xl px-4 py-2 rounded-2xl shadow-2xl border border-white/50 font-black text-indigo-950 text-xl italic tracking-tighter">
-                                                ₹{item.price}
+                                                {item.price} EP
                                             </div>
                                             <div className={`px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-white shadow-lg italic ${item.condition === 'new' ? 'bg-emerald-500' : item.condition === 'like-new' ? 'bg-indigo-500' : 'bg-amber-500'}`}>
                                                 Grade: {item.condition}
@@ -328,7 +328,7 @@ const Mart = () => {
                                     <input name="title" value={formData.title} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner" placeholder="e.g. Graphic Tablet" />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic ml-2">Network Valuation (₹)</label>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic ml-2">Network Valuation (EP)</label>
                                     <input type="number" name="price" value={formData.price} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner" placeholder="500" />
                                 </div>
                             </div>

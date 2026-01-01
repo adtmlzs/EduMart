@@ -169,7 +169,7 @@ const NotesVault = () => {
                     <div className="flex items-center space-x-8 px-8 py-4 lg:border-l border-gray-100 min-w-[300px] justify-center lg:justify-end">
                         <div className="text-right">
                             <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest italic mb-1">Asset Balance</p>
-                            <p className="text-2xl font-black text-indigo-950 italic tracking-tighter leading-none">₹{user.points || 0}</p>
+                            <p className="text-2xl font-black text-indigo-950 italic tracking-tighter leading-none">{user.points || 0} EP</p>
                         </div>
                         {user.role === 'student' && (
                             <button
@@ -238,7 +238,7 @@ const NotesVault = () => {
                                             {!unlocked ? (
                                                 <div className="text-right">
                                                     <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest italic mb-1">Asset Value</p>
-                                                    <p className="text-3xl font-black text-indigo-950 italic tracking-tighter leading-none">₹{note.price}</p>
+                                                    <p className="text-3xl font-black text-indigo-950 italic tracking-tighter leading-none">{note.price} EP</p>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center space-x-2 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
@@ -318,7 +318,7 @@ const NotesVault = () => {
                                     <input name="title" value={formData.title} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner" placeholder="e.g. Quantum Fluctuations" />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic ml-2">Valuation (₹)</label>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic ml-2">Valuation (EP)</label>
                                     <input type="number" name="price" value={formData.price} onChange={handleInputChange} min="0" required className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] py-6 px-10 text-sm font-bold text-indigo-950 focus:ring-4 focus:ring-primary-50 transition-all italic shadow-inner" placeholder="50" />
                                 </div>
                             </div>
